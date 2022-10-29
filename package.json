@@ -1,0 +1,26 @@
+{
+  "name": "requestah",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+      "dev": "nodemon index.js",
+      "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AUBGTheHUB/requestah.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/AUBGTheHUB/requestah/issues"
+  },
+  "homepage": "https://github.com/AUBGTheHUB/requestah#readme",
+  "dependencies": {
+    "discord.js": "^14.6.0",
+    "dotenv": "^16.0.3",
+    "nodemon": "^2.0.20"
+  }
+}

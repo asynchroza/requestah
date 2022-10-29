@@ -2,6 +2,7 @@ require('dotenv').config()
 const axios = require('axios')
 
 const Discord = require('discord.js')
+
 const client = new Discord.Client({
     intents: [
         Discord.GatewayIntentBits.MessageContent,
@@ -11,28 +12,59 @@ const client = new Discord.Client({
     ]
 });
 
+client.commands = new Discord.Collection();
+
 client.login(process.env.BOT_TOKEN)
 
-const CHANNEL_ID = "1036019427478622279"
+const CHANNEL_ID = "1036019427478622279" // programming channel 
 
 // bot structure
 
-// function getRequest(url, expectedResponseCode)
 // function scheduleRequest(url, expectedResponseCode, timeInterval) -> CRON
 
 // function listScheduledRequests -> returns all of the scheduled requests with identification numbers (indexes)
 // function removeScheduledRequest -> delete scheduled request by identification number (index)
 
-client.on("messageCreate", (message) => {
-    console.log(message)
-    if (message.content === "requestah") {
-        message.reply(`Hello Lord ${message.author}`)
+// Listen for commands
+
+client.on(Discord.Events.InteractionCreate, async interaction => {
+
+    console.log(interaction.options)
+
+    if (!interaction.isChatInputCommand()) return;
+
+    if (interaction.commandName === "request") {
+
+        /*
+        CommandInteractionOptionResolver {
+        _group: null,
+        _subcommand: null,
+        _hoistedOptions: [
+            { name: 'url', type: 3, value: 'facebook.com' },
+            { name: 'type', type: 3, value: 'get' },
+            { name: 'status', type: 4, value: 200 }
+        ]
+        */
+
+        try {
+
+            url = interaction.options["_hoistedOptions"][0]["value"],
+                type = interaction.options["_hoistedOptions"][1]["value"],
+                status = interaction.options["_hoistedOptions"][2]["value"]
+
+            interaction.reply(await request(url, type, status))
+        }
+
+        catch (error) {
+            // await
+            interaction.reply({content: `Request failed with the following exception: ${error}`})
+        }
     }
-    else if (message.content === "check") {
-        request("https://hubconf.thehub-aubg.com", "get", 200)
-    }
+
 })
 
+
+// Make a HTTP request
 async function request(url, requestType, expectedStatusCode) {
     const res = await axios({
         method: requestType,
@@ -40,5 +72,8 @@ async function request(url, requestType, expectedStatusCode) {
     })
 
     const channel = await client.channels.fetch(CHANNEL_ID)
-    channel.send(`${requestType} request to ${url} exited with code ${res.status}`)
+    // Come up with a better message
+    return `${requestType} request to ${url} exited with code ${res.status}`
 }
+
+

@@ -21,10 +21,6 @@ const CHANNEL_ID = "1035257919471624226" // general channel
 
 let scheduledRequests = {}
 
-// function listScheduledRequests -> returns all of the scheduled requests with identification numbers (indexes)
-// function removeScheduledRequest -> delete scheduled request by identification number (index)
-
-// Listen for commands
 client.on(Discord.Events.InteractionCreate, async interaction => {
 
     if (!interaction.isChatInputCommand()) return;

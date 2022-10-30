@@ -17,7 +17,7 @@ client.commands = new Discord.Collection();
 
 client.login(process.env.BOT_TOKEN)
 
-const CHANNEL_ID = "1036019427478622279" // programming channel 
+const CHANNEL_ID = "1035257919471624226" // general channel  
 
 let scheduledRequests = {}
 
@@ -46,8 +46,12 @@ client.on(Discord.Events.InteractionCreate, async interaction => {
 
             url = interaction.options["_hoistedOptions"][0]["value"]
             type = interaction.options["_hoistedOptions"][1]["value"]
-
-            interaction.reply(await request(url, type, true))
+            msg = await request(url, type, true)
+            if (msg === 0) {
+                interaction.reply("Timeout")
+            } else {
+                interaction.reply(msg)
+            }
         }
 
         catch (error) {
@@ -147,14 +151,26 @@ function scheduleRequest(interval, url, requestType, expectedStatusCode) {
 
 // Make a HTTP request
 async function request(url, requestType, isCommand) {
-    const res = await axios({
-        method: requestType,
-        url: url
-    })
+    try {
+        const res = await axios({
+            method: requestType,
+            url: url,
+            timeout: 2000
+        })
 
-    if (isCommand) {
-        return `${requestType} request to ${url} exited with code ${res.status}`
+        if (isCommand) {
+            return `${requestType} request to ${url} exited with code ${res.status}`
+        }
+
+        return res.status
+    }
+    catch (error) {
+        if (error = axios.AxiosError) {
+            return 0
+        }
+        else {
+            throw error
+        }
     }
 
-    return res.status
 }

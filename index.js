@@ -57,7 +57,7 @@ client.on(Discord.Events.InteractionCreate, async interaction => {
 
     }
 
-    if (interaction.commandName === "schedule") {
+    else if (interaction.commandName === "schedule") {
         try {
 
             interval = interaction.options["_hoistedOptions"][0]["value"]
@@ -71,7 +71,23 @@ client.on(Discord.Events.InteractionCreate, async interaction => {
             interaction.reply(error)
         }
     }
+
+    else if(interaction.commandName === "listscheduled"){
+        interaction.reply({content: beautify(scheduledRequests)})
+    }
 })
+
+function beautify(obj){
+    let str = "";
+    for ([key, val] of Object.entries(obj)){
+        str += `${key}: {\n`
+        for ([innerKey, innerVal] of Object.entries(val)){
+            str += `\t${innerKey}: ${innerVal}\n`
+        }
+        str += `}\n`
+    }
+    return str
+}
 
 function signifyFailure(requestType, url) {
     client.channels.cache.get(CHANNEL_ID).send(`⚠️ ${requestType.toUpperCase()} request to ${url} FAILED! ⚠️`)

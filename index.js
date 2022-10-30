@@ -52,12 +52,12 @@ client.on(Discord.Events.InteractionCreate, async interaction => {
 
         catch (error) {
             // await
-            interaction.reply({content: `Request failed with the following exception: ${error}`})
+            interaction.reply({ content: `Request failed with the following exception: ${error}` })
         }
 
     }
 
-    if (interaction.commandName === "schedule"){
+    if (interaction.commandName === "schedule") {
         try {
 
             interval = interaction.options["_hoistedOptions"][0]["value"]
@@ -73,37 +73,53 @@ client.on(Discord.Events.InteractionCreate, async interaction => {
     }
 })
 
-function signifyFailure(requestType, url){
+function signifyFailure(requestType, url) {
     client.channels.cache.get(CHANNEL_ID).send(`⚠️ ${requestType.toUpperCase()} request to ${url} FAILED! ⚠️`)
+}
+
+function getNameOfJob(interval, url, requestType, expectedStatusCode) {
+    function getKeyByValue() {
+        for (const [key, value] of Object.entries(scheduledRequests)) {
+            if (value.cronInterval == interval && value.url == url && value.requestType == requestType && value.expectedStatus == expectedStatusCode) {
+                return key
+            }
+        }
+    }
+
+    return getKeyByValue()
 }
 
 function scheduleRequest(interval, url, requestType, expectedStatusCode) {
     console.log("A job has been scheduled!")
 
-    const job = cron.schedule(interval, function() {
+    const job = cron.schedule(interval, async function () {
         console.log("SCHEDULED JOB IS RUNNING")
-        if(request(url, requestType) !== expectedStatusCode){
+        req = await request(url, requestType, false)
+        if (req !== expectedStatusCode) {
             console.log("A scheduled request failed!")
             signifyFailure(requestType, url)
-            console.log(cron.getTasks())
+
+            jobName = getNameOfJob(interval, url, requestType, expectedStatusCode)
+            cron.getTasks().get(jobName).stop()
+            delete scheduledRequests[jobName]
         }
     })
 
     // job.start()
 
-    scheduledRequests[job.options.name] = {"cronInterval": interval, "url": url, "requestType": requestType, "expectedStatus": expectedStatusCode}
+    scheduledRequests[job.options.name] = { "cronInterval": interval, "url": url, "requestType": requestType, "expectedStatus": expectedStatusCode }
 }
 
 // Make a HTTP request
 async function request(url, requestType, isCommand) {
     const res = await axios({
         method: requestType,
-        url: url,
+        url: url
     })
 
-    if(isCommand){
+    if (isCommand) {
         return `${requestType} request to ${url} exited with code ${res.status}`
     }
-    
+
     return res.status
 }

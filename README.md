@@ -1,27 +1,27 @@
 # Requestah - Discord Bot for checking the health status of services
 
 ## Commands 
-`schedule` - accepts: interval (cron), url, request type (GET, POST), expected status code:
+* <strong>schedule</strong> - accepts: `interval` (cron), `url`, `request type` (GET, POST), `expected status code`:
 
-- if the executed request returns a status code different than the one given as the default one, a Discord channel gets notified and the job is being garbaged. 
+    - if the executed request returns a status code different than the one given as the default one, a Discord channel gets notified and the job is being garbaged. 
 
 
-`request` - accepts: url, request (GET, POST):
+* <strong>request</strong> - accepts: `url`, `request type` (GET, POST):
 
-- just a simple request towards an url - returns the status code (Discord curl 😄)
+    - just a simple request towards an url - returns the status code (Discord curl 😄)
 
-`listscheduled`: 
-* lists all scheduled jobs  
+* <strong>listscheduled</strong>: 
+    * lists all scheduled jobs  
 
-`unschedule` - accepts: ID (matched key in `listscheduled`):
-*  stops a scheduled job
+* <strong>unschedule</strong> - accepts: `ID` (matched key in `listscheduled`):
+    *  stops a scheduled job
 
 ### Create a command
 
 ```
 POST 'https://discord.com/api/v10/applications/1036000679774396436/commands' 
 header 'Authorization: Bot <BOT_TOKEN>' 
-data: {
+data {
     "name": "request",
     "description": "Make a http request",
     "options": [

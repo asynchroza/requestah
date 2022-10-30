@@ -1,5 +1,20 @@
 # Requestah - Discord Bot for checking the health status of services
 
+## Commands 
+`schedule` - accepts: interval(cron), url, request type (GET, POST), expected status code   
+
+<strong>scheduled request</strong> 
+- if the executed request returns a status code different than the one given as the default one, a Discord channel gets notified and the job is being garbaged. 
+
+
+`request` - accepts: url, request (GET, POST)
+
+<strong>make a request</strong>
+- just a simple request towards an url - returns the status code (Discord curl 😄)
+
+`listscheduled` - TBA  (list all scheduled jobs)  
+`stopscheduled` - TBA  (stop scheduled job)
+
 ### Create a command
 
 ```

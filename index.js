@@ -72,16 +72,30 @@ client.on(Discord.Events.InteractionCreate, async interaction => {
         }
     }
 
-    else if(interaction.commandName === "listscheduled"){
-        interaction.reply({content: beautify(scheduledRequests)})
+    else if (interaction.commandName === "listscheduled") {
+        if (Object.keys(scheduledRequests).length === 0) {
+            interaction.reply({ content: "No requests are scheduled" })
+        } else {
+            interaction.reply({ content: beautify(scheduledRequests) })
+        }
+    }
+
+    else if (interaction.commandName === "unschedule") {
+        try {
+            stopScheduledJob(interaction.options["_hoistedOptions"][0]["value"])
+            interaction.reply({ content: "Job has been stopped" })
+        }
+        catch (error) {
+            interaction.reply({ content: "Something went wrong stopping the job!" })
+        }
     }
 })
 
-function beautify(obj){
+function beautify(obj) {
     let str = "";
-    for ([key, val] of Object.entries(obj)){
+    for ([key, val] of Object.entries(obj)) {
         str += `${key}: {\n`
-        for ([innerKey, innerVal] of Object.entries(val)){
+        for ([innerKey, innerVal] of Object.entries(val)) {
             str += `\t${innerKey}: ${innerVal}\n`
         }
         str += `}\n`
@@ -89,8 +103,15 @@ function beautify(obj){
     return str
 }
 
+function stopScheduledJob(jobName) {
+    cron.getTasks().get(jobName).stop()
+    delete scheduledRequests[jobName]
+}
+
 function signifyFailure(requestType, url) {
-    client.channels.cache.get(CHANNEL_ID).send(`⚠️ ${requestType.toUpperCase()} request to ${url} FAILED! ⚠️`)
+    client.channels.cache.get(CHANNEL_ID).send(`@here, \n
+    ⚠️ ${requestType.toUpperCase()} request to ${url} FAILED! ⚠️\n
+    Scheduled job has been stopped. Schedule a new one when you resolve the issue!`)
 }
 
 function getNameOfJob(interval, url, requestType, expectedStatusCode) {
@@ -115,9 +136,7 @@ function scheduleRequest(interval, url, requestType, expectedStatusCode) {
             console.log("A scheduled request failed!")
             signifyFailure(requestType, url)
 
-            jobName = getNameOfJob(interval, url, requestType, expectedStatusCode)
-            cron.getTasks().get(jobName).stop()
-            delete scheduledRequests[jobName]
+            stopScheduledJob(getNameOfJob(interval, url, requestType, expectedStatusCode))
         }
     })
 

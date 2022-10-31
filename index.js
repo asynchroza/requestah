@@ -151,7 +151,7 @@ async function request(url, requestType, isCommand) {
         const res = await axios({
             method: requestType,
             url: url,
-            timeout: 2000
+            timeout: 5000 
         })
 
         if (isCommand) {

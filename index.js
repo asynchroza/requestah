@@ -108,9 +108,9 @@ function stopScheduledJob(jobName) {
     delete scheduledRequests[jobName]
 }
 
-function signifyFailure(requestType, url) {
+function signifyFailure(requestType, url, reason) {
     client.channels.cache.get(CHANNEL_ID).send(`@here, \n
-    ⚠️ ${requestType.toUpperCase()} request to ${url} FAILED! ⚠️\n
+    ⚠️ ${requestType.toUpperCase()} request to ${url} ${reason} ⚠️\n
     Scheduled job has been stopped. Schedule a new one when you resolve the issue!`)
 }
 
@@ -131,16 +131,27 @@ function scheduleRequest(interval, url, requestType, expectedStatusCode) {
 
     const job = cron.schedule(interval, async function () {
         console.log("SCHEDULED JOB IS RUNNING")
-        req = await request(url, requestType, false)
-        if (req !== expectedStatusCode) {
+
+        let req;
+        try {
+            req = await request(url, requestType, false)
+        } catch (error) {
+            signifyFailure(requestType, url, `failed due to ${error}`)
+
+            stopScheduledJob(getNameOfJob(interval, url, requestType, expectedStatusCode))
+        }
+        if (req === 0) {
+            signifyFailure(requestType, url, "failed due to TIMEOUT")
+
+            stopScheduledJob(getNameOfJob(interval, url, requestType, expectedStatusCode))
+        }
+        else if (req !== expectedStatusCode) {
             console.log("A scheduled request failed!")
-            signifyFailure(requestType, url)
+            signifyFailure(requestType, url, "FAILED")
 
             stopScheduledJob(getNameOfJob(interval, url, requestType, expectedStatusCode))
         }
     })
-
-    // job.start()
 
     scheduledRequests[job.options.name] = { "cronInterval": interval, "url": url, "requestType": requestType, "expectedStatus": expectedStatusCode }
 }
@@ -151,7 +162,7 @@ async function request(url, requestType, isCommand) {
         const res = await axios({
             method: requestType,
             url: url,
-            timeout: 5000 
+            timeout: 5000
         })
 
         if (isCommand) {

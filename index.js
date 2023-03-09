@@ -179,6 +179,7 @@ async function request(url, requestType, isCommand) {
         ? `${requestType} request to ${url} exited with code ${error.response.status}`
         : error.response.status;
     }
-    throw error;
+
+    return error;
   }
 }

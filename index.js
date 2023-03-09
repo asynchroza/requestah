@@ -174,7 +174,7 @@ async function request(url, requestType, isCommand) {
 
     return res.status;
   } catch (error) {
-    if (error.response.status !== undefined) {
+    if (error.response !== undefined) {
       return isCommand
         ? `${requestType} request to ${url} exited with code ${error.response.status}`
         : error.response.status;

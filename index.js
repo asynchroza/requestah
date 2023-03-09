@@ -17,7 +17,7 @@ client.commands = new Discord.Collection();
 
 client.login(process.env.BOT_TOKEN);
 
-const CHANNEL_ID = "1035257919471624226"; // general channel
+const CHANNEL_ID = "1082684525215219823"; // requestah notification channel
 
 let scheduledRequests = {};
 

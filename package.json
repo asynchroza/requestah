@@ -1,6 +1,6 @@
 {
   "name": "requestah",
-  "version": "1.0.0",
+  "version": "0.0.2",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,10 +10,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/AUBGTheHUB/requestah.git"
+    "url": "https://github.com/AUBGTheHUB/requestah.git"
   },
   "keywords": [],
-  "author": "",
+  "author": "Michael Bozhilov @asynchroza",
   "license": "ISC",
   "bugs": {
     "url": "https://github.com/AUBGTheHUB/requestah/issues"

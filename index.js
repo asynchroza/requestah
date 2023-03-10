@@ -40,11 +40,7 @@ client.on(Discord.Events.InteractionCreate, async (interaction) => {
       url = interaction.options["_hoistedOptions"][0]["value"];
       type = interaction.options["_hoistedOptions"][1]["value"];
       msg = await request(url, type, true);
-      if (msg === 0) {
-        interaction.reply("Timeout");
-      } else {
-        interaction.reply(msg);
-      }
+      interaction.reply({ content: msg });
     } catch (error) {
       // await
       interaction.reply({
@@ -180,6 +176,7 @@ async function request(url, requestType, isCommand) {
         : error.response.status;
     }
 
-    return error;
+    console.log(error.cause.code)
+    return `${requestType} request to ${url} failed with the following code: ${error.cause.code}`;
   }
 }

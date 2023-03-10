@@ -131,13 +131,8 @@ function scheduleRequest(interval, url, requestType, expectedStatusCode) {
         getNameOfJob(interval, url, requestType, expectedStatusCode)
       );
     }
-    if (req === 0) {
-      signifyFailure(requestType, url, "failed due to TIMEOUT");
 
-      stopScheduledJob(
-        getNameOfJob(interval, url, requestType, expectedStatusCode)
-      );
-    } else if (req !== expectedStatusCode) {
+    if (req !== expectedStatusCode) {
       console.log("A scheduled request failed!");
       signifyFailure(requestType, url, "FAILED");
 
@@ -176,7 +171,7 @@ async function request(url, requestType, isCommand) {
         : error.response.status;
     }
 
-    console.log(error.cause.code)
+    console.log(error.cause.code);
     return `${requestType} request to ${url} failed with the following code: ${error.cause.code}`;
   }
 }

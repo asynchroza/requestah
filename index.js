@@ -78,13 +78,13 @@ client.on(Discord.Events.InteractionCreate, async (interaction) => {
 function beautify(obj) {
   let str = "";
   for ([key, val] of Object.entries(obj)) {
-    str += `${key}: {\n`;
+    str += `"${key}": {\n`;
     for ([innerKey, innerVal] of Object.entries(val)) {
-      str += `\t${innerKey}: ${innerVal}\n`;
+      str += `\t"${innerKey}": "${innerVal}"\n`;
     }
     str += `}\n`;
   }
-  return str;
+  return '```json\n'+str+'\n```';
 }
 
 function stopScheduledJob(jobName) {
@@ -134,7 +134,7 @@ function scheduleRequest(interval, url, requestType, expectedStatusCode) {
 
     if (req !== expectedStatusCode) {
       console.log("A scheduled request failed!");
-      signifyFailure(requestType, url, "FAILED");
+      signifyFailure(requestType, url, "returned an unexpected status code");
 
       stopScheduledJob(
         getNameOfJob(interval, url, requestType, expectedStatusCode)
@@ -156,7 +156,7 @@ async function request(url, requestType, isCommand) {
     const res = await axios({
       method: requestType,
       url: url,
-      timeout: 5000,
+      timeout: 10000,
     });
 
     if (isCommand) {
@@ -171,7 +171,6 @@ async function request(url, requestType, isCommand) {
         : error.response.status;
     }
 
-    console.log(error.cause.code);
-    return `${requestType} request to ${url} failed with the following code: ${error.cause.code}`;
+    return error.cause ? `${requestType} request to ${url} failed with the following code: ${error.cause.code}`: `${requestType} request to ${url} failed with an unknown error!`;
   }
 }
